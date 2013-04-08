@@ -176,12 +176,21 @@ function passcodeView(code,callback,params){
 			}
 		},
 		error : function(){
-			boxContainer.animate({backgroundColor:options.errorColor}, function(){
-				reset.all();					
-				boxContainer.animate({
-					backgroundColor:options.backgroundColor, 
-					duration:3000});
-			});	
+			boxContainer.backgroundColor = options.errorColor;
+			var duration = ((_isAndroid) ? 1500 : 2000);
+			var hideError = Ti.UI.createAnimation({
+				backgroundColor:options.backgroundColor,
+				duration : duration
+			});
+			var annimatedPresented = function(){
+				reset.all();
+				hideError.removeEventListener('complete',annimatedPresented);
+				if(_isAndroid){
+					boxContainer.backgroundColor = options.backgroundColor;
+				}
+			};
+			hideError.addEventListener('complete',annimatedPresented);
+			boxContainer.animate(hideError);	
 		}
 	};
 	hiddenTextField.addEventListener('change', function(e){
